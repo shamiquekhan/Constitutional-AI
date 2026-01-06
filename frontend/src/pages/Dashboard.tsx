@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useToast } from '../hooks/useToast';
+import LoadingSpinner, { SkeletonLoader } from '../components/LoadingSpinner';
 
 interface Message {
   id: string;
@@ -16,6 +18,7 @@ interface Message {
 }
 
 export default function Dashboard() {
+  const { showSuccess, showError, showWarning, ToastContainer } = useToast();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -29,7 +32,23 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSend = async () => {
-    if (!inputValue.trim() || isLoading) return;
+    if (!inputValue.trim() || isLoading) {
+      if (!inputValue.trim()) {
+        showWarning('Please enter a legal question');
+      }
+      return;
+    }
+
+    // Validation
+    if (inputValue.length < 5) {
+      showWarning('Query must be at least 5 characters');
+      return;
+    }
+
+    if (inputValue.length > 500) {
+      showWarning('Query cannot exceed 500 characters');
+      return;
+    }
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -43,7 +62,8 @@ export default function Dashboard() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v1/query/legal`, {
+      const API_URL = process.env.REACT_APP_API_URL || '';
+      const response = await fetch(`${API_URL}/api/v1/query/legal`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -56,7 +76,8 @@ export default function Dashboard() {
       });
 
       if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || `API error: ${response.status}`);
       }
 
       const data = await response.json();
@@ -66,9 +87,9 @@ export default function Dashboard() {
         type: 'ai',
         content: data.answer || 'I apologize, but I could not generate a response for this query.',
         verified: data.safety_check_passed !== false && data.confidence >= 0.7,
-        citations: data.citations?.map((c: any) => ({
-          text: c.text || c.section || c.article || c.case_name,
-          source: c.source || c.source_type || 'Unknown'
+        citations: data.sources?.map((s: any) => ({
+          text: s.title || s.source || 'Legal Source',
+          source: s.type || s.source_type || 'Unknown'
         })) || [],
         devilsAdvocate: data.devils_advocate_response,
         showDevil: false,
@@ -79,12 +100,20 @@ export default function Dashboard() {
       };
 
       setMessages(prev => [...prev, aiMessage]);
-    } catch (error) {
-      // Query error occurred
+      
+      if (data.confidence >= 0.8) {
+        showSuccess('High confidence answer generated');
+      } else if (data.confidence < 0.5) {
+        showWarning('Low confidence answer - please consult a lawyer');
+      }
+    } catch (error: any) {
+      console.error('Query error:', error);
+      showError(error.message || 'Failed to process your query. Please try again.');
+      
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
-        content: 'I apologize, but I encountered an error processing your query. Please ensure the backend server is running and try again.',
+        content: 'I apologize, but I encountered an error processing your query. Please try again or rephrase your question.',
         verified: false,
         citations: []
       };
@@ -187,6 +216,8 @@ export default function Dashboard() {
                 <div 
                   key={message.id} 
                   className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'} animate-fadeIn`}
+                  role={message.type === 'ai' ? 'article' : undefined}
+                  aria-live={message.type === 'ai' ? 'polite' : undefined}
                 >
                   <div className={`max-w-[75%] px-6 py-4 rounded-xl text-[15px] leading-[1.7] ${
                     message.type === 'user' 
@@ -273,13 +304,9 @@ export default function Dashboard() {
               ))}
               
               {isLoading && (
-                <div className="flex justify-start">
+                <div className="flex justify-start animate-fadeIn">
                   <div className="bg-[#F0F4F8] rounded-xl px-6 py-4">
-                    <div className="flex gap-1">
-                      <div className="w-2 h-2 bg-medium-blue rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                      <div className="w-2 h-2 bg-medium-blue rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                      <div className="w-2 h-2 bg-medium-blue rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                    </div>
+                    <LoadingSpinner message="Analyzing your query..." size="sm" />
                   </div>
                 </div>
               )}
@@ -292,16 +319,21 @@ export default function Dashboard() {
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+              onKeyPress={(e) => e.key === 'Enter' && !isLoading && handleSend()}
               placeholder="Type a legal query…"
+              aria-label="Legal query input"
+              aria-describedby="input-hint"
               className="flex-1 px-5 py-3.5 border border-line-gray rounded-lg text-sm focus:outline-none focus:border-medium-blue focus:ring-4 focus:ring-medium-blue/10 transition"
+              disabled={isLoading}
             />
+            <span id="input-hint" className="sr-only">Enter your legal question and press Enter or click Send</span>
             <button
               onClick={handleSend}
               disabled={isLoading || !inputValue.trim()}
-              className="bg-medium-blue text-white px-7 py-3.5 rounded-lg text-sm font-medium hover:bg-deep-blue transition disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label="Send query"
+              className="bg-medium-blue text-white px-7 py-3.5 rounded-lg text-sm font-medium hover:bg-deep-blue transition disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-4 focus:ring-medium-blue/20"
             >
-              Send
+              {isLoading ? 'Sending...' : 'Send'}
             </button>
           </div>
         </div>
@@ -483,6 +515,9 @@ export default function Dashboard() {
         </div>
       </footer>
 
+      {/* Toast Notifications */}
+      <ToastContainer />
+
       <style>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(10px); }
@@ -490,6 +525,19 @@ export default function Dashboard() {
         }
         .animate-fadeIn {
           animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes slide-in {
+          from {
+            transform: translateX(400px);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        .animate-slide-in {
+          animation: slide-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
       `}</style>
     </main>
