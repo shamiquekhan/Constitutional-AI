@@ -1,0 +1,11 @@
+{
+  "name": "constitutional-ai",
+  "version": "1.0.0",
+  "description": "Zero-Hallucination Legal Research Assistant",
+  "scripts": {
+    "vercel-build": "cd frontend && npm install && npm run build"
+  },
+  "engines": {
+    "node": ">=16.x"
+  }
+}

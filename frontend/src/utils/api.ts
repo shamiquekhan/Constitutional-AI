@@ -1,6 +1,9 @@
 import axios, { AxiosInstance } from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+// API Base URL - uses relative path for Vercel deployment, localhost for development
+const API_BASE_URL = process.env.REACT_APP_API_URL || (
+  process.env.NODE_ENV === 'production' ? '' : 'http://localhost:8000'
+);
 
 // Create axios instance with default config
 const apiClient: AxiosInstance = axios.create({
