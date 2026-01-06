@@ -1,0 +1,12 @@
+# Minimal requirements for quick startup
+# Web Framework
+fastapi
+uvicorn[standard]
+python-multipart
+python-dotenv
+
+# Database (SQLite for now, skip PostgreSQL)
+sqlalchemy
+
+# Mock responses for now - skip heavy ML dependencies
+httpx

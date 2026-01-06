@@ -1,0 +1,146 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Scandinavian Design System CSS Variables - Black-Blue-Gray */
+:root {
+  /* Colors - Professional Scandinavian Palette */
+  --color-deep-blue: #0D1B2A;
+  --color-medium-blue: #1B4F72;
+  --color-near-black: #111111;
+  --color-line-gray: #E1E5EA;
+  --color-bg-gray: #F5F7FA;
+  --color-white: #FFFFFF;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --color-info: #3B82F6;
+
+  /* Spacing - Generous Nordic Whitespace */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+  --space-32: 8rem;
+
+  /* Border Radius - Soft & Minimal */
+  --radius-sm: 4px;
+  --radius-base: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* Shadows - Soft & Subtle */
+  --shadow-soft: 0 2px 8px rgba(47, 57, 69, 0.04);
+  --shadow-base: 0 4px 16px rgba(47, 57, 69, 0.06);
+  --shadow-lg: 0 8px 24px rgba(47, 57, 69, 0.08);
+  --shadow-xl: 0 16px 48px rgba(47, 57, 69, 0.10);
+
+  /* Transitions */
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --ease-standard: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Base Styles - Scandinavian Aesthetic */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--color-bg-gray);
+  color: var(--color-near-black);
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+}
+
+/* Typography - Light & Airy */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+p {
+  color: var(--color-slate-500);
+  line-height: 1.8;
+}
+
+/* Utility Classes */
+.navy { color: var(--color-navy); }
+.blue { color: var(--color-blue); }
+.blue-light { color: var(--color-blue-light); }
+.gray-600 { color: var(--color-gray-600); }
+
+.bg-navy { background-color: var(--color-navy); }
+.bg-blue { background-color: var(--color-blue); }
+.bg-off-white { background-color: var(--color-off-white); }
+
+.text-navy { color: var(--color-navy); }
+.text-blue { color: var(--color-blue); }
+.text-success { color: var(--color-success); }
+.text-warning { color: var(--color-warning); }
+.text-error { color: var(--color-error); }
+.text-info { color: var(--color-info); }
+
+.bg-success { background-color: var(--color-success); }
+.bg-warning { background-color: var(--color-warning); }
+.bg-error { background-color: var(--color-error); }
+.bg-info { background-color: var(--color-info); }
+
+.border-blue { border-color: var(--color-blue); }
+.border-success { border-color: var(--color-success); }
+.border-error { border-color: var(--color-error); }
+.border-gray-100 { border-color: var(--color-gray-100); }
+.border-gray-200 { border-color: var(--color-gray-200); }
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.5rem; }
+}
+
+/* Print Styles */
+@media print {
+  body {
+    background-color: white;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}

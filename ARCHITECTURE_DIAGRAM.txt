@@ -1,0 +1,305 @@
+# Constitutional AI - System Architecture Diagram
+
+## Complete RAG Pipeline Visualization
+
+```
+┌───────────────────────────────────────────────────────────────────────────────┐
+│                                                                               │
+│                         CONSTITUTIONAL AI                                     │
+│                  Zero-Hallucination Legal Research Assistant                  │
+│                                                                               │
+└───────────────────────────────────────────────────────────────────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                              FRONTEND LAYER (React)
+═══════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  Browser: http://localhost:3000                                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐   │
+│  │  Dashboard   │  │  Research    │  │    Tools     │  │   Settings   │   │
+│  │              │  │  Workspace   │  │              │  │              │   │
+│  │  • Hero      │  │              │  │ • Devil's    │  │ • Preferences│   │
+│  │  • Query UI  │  │              │  │   Advocate   │  │ • Theme      │   │
+│  │  • Results   │  │              │  │ • Memo Gen   │  │ • Account    │   │
+│  └──────┬───────┘  └──────────────┘  └──────────────┘  └──────────────┘   │
+│         │                                                                   │
+│  ┌──────▼─────────────────────────────────────────────────────────────┐    │
+│  │                    Core Components                                  │    │
+│  │  ┌────────────────┐ ┌────────────────┐ ┌────────────────┐         │    │
+│  │  │ QueryInterface │ │ResponseDisplay│ │ CitationBlock  │         │    │
+│  │  │                │ │                │ │                │         │    │
+│  │  │ • Search bar   │ │ • Answer       │ │ • Citations    │         │    │
+│  │  │ • Filters      │ │ • Confidence   │ │ • Status       │         │    │
+│  │  │ • Suggestions  │ │ • Sources      │ │ • Amendments   │         │    │
+│  │  └────────┬───────┘ └────────────────┘ └────────────────┘         │    │
+│  └───────────┼──────────────────────────────────────────────────────┘    │
+│              │                                                             │
+│  ┌───────────▼────────────────────────────────────────────────────────┐   │
+│  │              useLegalQuery Hook (API Integration)                   │   │
+│  │  • State management with Zustand                                    │   │
+│  │  • Axios HTTP client                                                │   │
+│  │  • Error handling                                                   │   │
+│  └───────────┬─────────────────────────────────────────────────────────┘   │
+└─────────────┼────────────────────────────────────────────────────────────┘
+              │
+              │ HTTP POST
+              │ {query, jurisdiction, codeType, yearRange}
+              │
+              ▼
+═══════════════════════════════════════════════════════════════════════════════
+                              API GATEWAY LAYER
+═══════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  FastAPI Server: http://localhost:8000                                      │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌────────────────────────────────────────────────────────────────────┐    │
+│  │                     API Routes (REST)                               │    │
+│  │                                                                      │    │
+│  │  POST   /api/v1/query/legal          Main query endpoint            │    │
+│  │  GET    /api/v1/query/suggestions    Query suggestions              │    │
+│  │  GET    /api/v1/query/{id}           Retrieve previous query        │    │
+│  │  GET    /api/v1/citations/{id}       Citation details               │    │
+│  │  POST   /api/v1/verification         Verify citation                │    │
+│  │  POST   /api/v1/devils-advocate      Generate counter-arguments     │    │
+│  │  POST   /api/v1/memorandum           Generate legal memo            │    │
+│  │  GET    /health                      Health check                   │    │
+│  │                                                                      │    │
+│  └────────────────────────────┬────────────────────────────────────────┘    │
+│                               │                                             │
+│  ┌────────────────────────────▼─────────────────────────────────────────┐  │
+│  │                  Middleware Layer                                     │  │
+│  │  • CORS (allow frontend)                                             │  │
+│  │  • Error handling                                                    │  │
+│  │  • Request validation                                                │  │
+│  │  • Logging                                                           │  │
+│  └────────────────────────────┬──────────────────────────────────────────┘  │
+└─────────────────────────────┼─────────────────────────────────────────────┘
+                              │
+                              ▼
+═══════════════════════════════════════════════════════════════════════════════
+                          SERVICE ORCHESTRATION LAYER
+═══════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                       LegalQAService (Orchestrator)                          │
+│  Coordinates: Retrieve → Generate → Verify pipeline                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  async def process_query(query, filters):                                   │
+│      1. sources = await retriever.retrieve(query, filters)                  │
+│      2. result = await generator.generate(query, sources)                   │
+│      3. verified = await verifier.verify_citations(result.citations)        │
+│      4. return complete_response                                            │
+│                                                                              │
+└───────┬──────────────────────┬──────────────────────┬──────────────────────┘
+        │                      │                      │
+        │                      │                      │
+        ▼                      ▼                      ▼
+
+═══════════════════════════════════════════════════════════════════════════════
+                               RAG PIPELINE CORE
+═══════════════════════════════════════════════════════════════════════════════
+
+┌──────────────────────┐  ┌──────────────────────┐  ┌──────────────────────┐
+│   LegalRetriever     │  │  GroundedGenerator   │  │ VerificationService  │
+│   (Hybrid Search)    │  │   (Grounded LLM)     │  │  (Citation Check)    │
+├──────────────────────┤  ├──────────────────────┤  ├──────────────────────┤
+│                      │  │                      │  │                      │
+│ Stage 1: BM25        │  │ System Prompt:       │  │ Check Status:        │
+│ • Elasticsearch      │  │ "NO hallucinations"  │  │ • Active             │
+│ • Keyword matching   │  │ "MUST cite sources"  │  │ • Amended            │
+│ • Fuzzy search       │  │                      │  │ • Repealed           │
+│                      │  │ Input:               │  │                      │
+│ Stage 2: Vector      │  │ • Query              │  │ Amendment History:   │
+│ • Pinecone           │  │ • Context (sources)  │  │ • Track changes      │
+│ • Semantic search    │  │                      │  │ • Effective dates    │
+│ • Cosine similarity  │  │ Output:              │  │                      │
+│                      │  │ • Answer + citations │  │ Precedent Check:     │
+│ Stage 3: Hybrid      │  │ • Confidence score   │  │ • Case validity      │
+│ • 0.4*BM25           │  │ • Source grounding   │  │ • Overruled?         │
+│ • 0.6*Vector         │  │                      │  │                      │
+│                      │  │ Temperature: 0.1     │  │ Confidence: 99%      │
+│ Stage 4: Re-rank     │  │ Max Tokens: 2048     │  │                      │
+│ • Authority level    │  │                      │  │                      │
+│ • Supreme Court > HC │  │ Model: GPT-4 Turbo   │  │                      │
+│                      │  │                      │  │                      │
+│ Stage 5: Extract     │  │ [CITATION: id]       │  │ Database Lookup      │
+│ • Citations (regex)  │  │ forced format        │  │ Real-time            │
+│                      │  │                      │  │                      │
+└──────┬───────────────┘  └──────┬───────────────┘  └──────┬───────────────┘
+       │                         │                         │
+       │                         │                         │
+       ▼                         ▼                         ▼
+
+═══════════════════════════════════════════════════════════════════════════════
+                          DATA & INFRASTRUCTURE LAYER
+═══════════════════════════════════════════════════════════════════════════════
+
+┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐  ┌────────┐
+│  Elasticsearch   │  │    Pinecone      │  │   PostgreSQL     │  │ Redis  │
+│  (BM25 Search)   │  │  (Vector Store)  │  │   (Metadata)     │  │(Cache) │
+├──────────────────┤  ├──────────────────┤  ├──────────────────┤  ├────────┤
+│                  │  │                  │  │                  │  │        │
+│ Index:           │  │ Index:           │  │ Tables:          │  │ Cache: │
+│ legal_documents  │  │ constitutional-  │  │ • query_history  │  │ • LRU  │
+│                  │  │ ai               │  │ • citations      │  │ • TTL  │
+│ Fields:          │  │                  │  │ • documents      │  │ • 1hr  │
+│ • content (text) │  │ Vectors:         │  │ • users          │  │        │
+│ • section        │  │ • 1536-dim       │  │                  │  │ Keys:  │
+│ • source         │  │ • cosine metric  │  │ Indexes:         │  │ • query│
+│ • metadata       │  │                  │  │ • query_id       │  │ • cite │
+│                  │  │ Metadata:        │  │ • citation_id    │  │        │
+│ Mappings:        │  │ • source         │  │ • document_id    │  │        │
+│ • text: analyzed │  │ • section        │  │                  │  │        │
+│ • keyword: exact │  │ • authority      │  │ Relationships:   │  │        │
+│                  │  │ • date           │  │ One-to-many      │  │        │
+│                  │  │                  │  │                  │  │        │
+│ BM25 Algorithm   │  │ Similarity:      │  │ JSONB metadata   │  │        │
+│ Fast keyword     │  │ Fast vector      │  │ Full-text search │  │        │
+└──────────────────┘  └──────────────────┘  └──────────────────┘  └────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+                          EXTERNAL SERVICES LAYER
+═══════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────┐          ┌──────────────────────────────────┐
+│       OpenAI API             │          │     Document Sources             │
+├─────────────────────────────┤          ├──────────────────────────────────┤
+│                              │          │                                  │
+│ Model: GPT-4 Turbo           │          │ • Constitution of India (1950)   │
+│ Temperature: 0.1             │          │ • Indian Penal Code (IPC)        │
+│ Max Tokens: 2048             │          │ • CrPC, CPC                      │
+│                              │          │ • Supreme Court judgments        │
+│ Embeddings:                  │          │ • High Court cases               │
+│ text-embedding-ada-002       │          │ • Legal amendments               │
+│ Dimension: 1536              │          │                                  │
+│                              │          │ Format: PDF → Text → Chunks      │
+│                              │          │ Processing: Semantic chunking    │
+└─────────────────────────────┘          └──────────────────────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                             DATA FLOW DIAGRAM
+═══════════════════════════════════════════════════════════════════════════════
+
+User Query: "What are fundamental rights under Article 19?"
+      │
+      ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ 1. RETRIEVAL (Hybrid Search)                                    │
+│    ┌──────────────────────┐        ┌──────────────────────┐    │
+│    │ BM25 (Elasticsearch) │        │ Vector (Pinecone)     │    │
+│    │ "Article 19"         │        │ Embed query → Search  │    │
+│    │ "fundamental rights" │        │ Semantic similarity   │    │
+│    └──────────┬───────────┘        └──────────┬───────────┘    │
+│               │                               │                │
+│               └───────────┬───────────────────┘                │
+│                           ▼                                    │
+│                   Merge + Re-rank                              │
+│                   Top 10 sources                               │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ 2. GENERATION (Grounded LLM)                                    │
+│    System Prompt: "Only use provided sources"                  │
+│    Context: [10 legal documents]                               │
+│    Query: "What are fundamental rights under Article 19?"      │
+│                                                                 │
+│    LLM Processing...                                            │
+│    ↓                                                            │
+│    Answer: "Article 19 guarantees:                             │
+│    1. Freedom of speech [CITATION: Article 19(1)(a)]           │
+│    2. Freedom to assemble [CITATION: Article 19(1)(b)]         │
+│    ..."                                                         │
+│                                                                 │
+│    Confidence: 95% (based on 3 sources)                        │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ 3. VERIFICATION (Citation Check)                                │
+│    For each citation:                                           │
+│    • Article 19(1)(a) → Status: Active ✓                        │
+│    • Article 19(1)(b) → Status: Active ✓                        │
+│    • Check amendments: 44th Amendment (1978)                    │
+│                                                                 │
+│    All citations verified ✓                                     │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ 4. RESPONSE (to Frontend)                                       │
+│    {                                                            │
+│      "answer": "Full answer with citations",                   │
+│      "sources": [10 documents],                                │
+│      "citations": [verified citations],                        │
+│      "confidence": 0.95,                                        │
+│      "processing_time": 1847ms                                 │
+│    }                                                            │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │
+                            ▼
+                  Display in React UI
+                  with citations highlighted
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                      DEPLOYMENT ARCHITECTURE (Production)
+═══════════════════════════════════════════════════════════════════════════════
+
+                           ┌─────────────────┐
+                           │   CloudFlare    │
+                           │   (CDN + WAF)   │
+                           └────────┬────────┘
+                                    │
+                    ┌───────────────┼───────────────┐
+                    │                               │
+         ┌──────────▼─────────┐         ┌──────────▼─────────┐
+         │  Frontend (S3)      │         │   Backend (EKS)    │
+         │  React Static       │         │   Kubernetes       │
+         │  CloudFront         │         │   • 3 pods         │
+         └─────────────────────┘         │   • Auto-scaling   │
+                                        │   • Load balancer  │
+                                        └──────────┬─────────┘
+                                                   │
+                            ┌──────────────────────┼──────────────────────┐
+                            │                      │                      │
+                   ┌────────▼────────┐   ┌────────▼────────┐   ┌────────▼────────┐
+                   │ RDS PostgreSQL  │   │ ElastiCache     │   │ Elasticsearch   │
+                   │ (Multi-AZ)      │   │ Redis           │   │ Managed         │
+                   └─────────────────┘   └─────────────────┘   └─────────────────┘
+                            │
+                   ┌────────▼────────┐
+                   │   Pinecone      │
+                   │   (Hosted)      │
+                   └─────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                           MONITORING & OBSERVABILITY
+═══════════════════════════════════════════════════════════════════════════════
+
+┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐
+│   Prometheus     │  │    Grafana       │  │     Sentry       │
+│   (Metrics)      │  │  (Dashboards)    │  │ (Error Tracking) │
+├──────────────────┤  ├──────────────────┤  ├──────────────────┤
+│ • Request count  │  │ • Response time  │  │ • Stack traces   │
+│ • Response time  │  │ • Error rate     │  │ • User context   │
+│ • Error rate     │  │ • Confidence     │  │ • Breadcrumbs    │
+│ • DB queries     │  │ • Source quality │  │                  │
+└──────────────────┘  └──────────────────┘  └──────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Constitutional AI - "In law, creativity is dangerous. We speak only with proof."
+
+═══════════════════════════════════════════════════════════════════════════════
+```
