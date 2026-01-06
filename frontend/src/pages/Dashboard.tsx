@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useToast } from '../hooks/useToast';
 import LoadingSpinner, { SkeletonLoader } from '../components/LoadingSpinner';
 import { GlowingEffect } from '../components/ui/glowing-effect';
-import { Scale, GraduationCap, Users } from 'lucide-react';
+import { Timeline } from '../components/ui/timeline';
+import { Scale, GraduationCap, Users, Shield, Search, FileCheck, AlertCircle, CheckCircle } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -517,57 +518,199 @@ export default function Dashboard() {
       </section>
 
       {/* Workflow Section */}
-      <section id="workflow" className="bg-white py-32 relative">
+      <section id="workflow" className="bg-bg-gray py-16 relative">
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-line-gray to-transparent"></div>
         
-        <div className="max-w-[1600px] mx-auto px-16 relative z-10">
-          <h2 className="text-center text-[44px] font-extrabold text-deep-blue mb-24 tracking-tight relative">
-            How It Works
-            <span className="block w-16 h-1 bg-gradient-to-r from-medium-blue to-accent-blue mx-auto mt-5 rounded-full"></span>
-          </h2>
-          
-          <div className="grid lg:grid-cols-2 gap-16 items-start">
-            {/* Image on the left */}
-            <div className="sticky top-24">
-              <img 
-                src="/ui idea/Technical_Workflow__Query_to_Verified_Answer.png" 
-                alt="Technical Workflow - Query to Verified Answer" 
-                className="w-full h-auto rounded-xl shadow-lg"
-              />
-            </div>
-            
-            {/* Steps on the right */}
-            <div className="flex flex-col gap-7">
-            {[
-              { num: 1, title: 'Input Validation', desc: 'Validates user query for harmful intent, personal advice detection, and jurisdiction checks' },
-              { num: 2, title: 'Source Retrieval', desc: 'Retrieves verified sources from Constitution of India, IPC, CrPC, and Supreme Court judgments' },
-              { num: 3, title: 'Answer Generation', desc: 'Generates response using only verified sources with strict citation requirements' },
-              { num: 4, title: 'Answer Validation', desc: 'Validates citations, detects hallucinations, and ensures minimum confidence threshold' },
-              { num: 5, title: 'Safety Check', desc: 'Final safety verification before returning verified answer to user' }
-            ].map((step) => (
-              <div 
-                key={step.num}
-                className="flex gap-10 items-start p-12 bg-gradient-to-br from-white to-bg-gray rounded-2xl border-2 border-line-gray shadow-sm hover:border-medium-blue hover:shadow-xl hover:translate-x-2 transition-all relative overflow-hidden group"
-              >
-                <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-medium-blue to-accent-blue scale-y-0 group-hover:scale-y-100 origin-top transition-transform"></div>
-                
-                <div className="w-16 h-16 bg-gradient-to-br from-medium-blue to-accent-blue text-white rounded-2xl flex items-center justify-center font-extrabold text-2xl shadow-lg flex-shrink-0 relative z-10">
-                  {step.num}
+        <Timeline data={[
+          {
+            title: "Step 1",
+            content: (
+              <div className="space-y-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-medium-blue/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <AlertCircle className="w-6 h-6 text-medium-blue" />
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold text-deep-blue mb-3">Input Validation</h4>
+                    <p className="text-gray-600 text-sm md:text-base mb-4 leading-relaxed">
+                      Every query undergoes rigorous validation to detect harmful intent, personal legal advice requests, 
+                      and jurisdiction verification. This critical first layer ensures only legitimate educational queries proceed.
+                    </p>
+                    <div className="bg-white rounded-lg p-4 border border-line-gray">
+                      <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                        <span className="font-medium">Harmful intent detection</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                        <span className="font-medium">Personal advice filtering</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                        <span className="font-medium">Jurisdiction verification</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                
-                <div className="flex-1 relative z-10">
-                  <h3 className="text-lg font-extrabold text-deep-blue mb-2.5 tracking-tight">
-                    {step.title}
-                  </h3>
-                  <p className="text-[15px] text-gray-600 leading-relaxed font-medium">
-                    {step.desc}
-                  </p>
-                </div>
+                <img 
+                  src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&auto=format&fit=crop"
+                  alt="Input validation process"
+                  className="w-full h-48 md:h-64 object-cover rounded-xl shadow-lg"
+                />
               </div>
-            ))}
-            </div>
-          </div>
-        </div>
+            ),
+          },
+          {
+            title: "Step 2",
+            content: (
+              <div className="space-y-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-medium-blue/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Search className="w-6 h-6 text-medium-blue" />
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold text-deep-blue mb-3">Source Retrieval</h4>
+                    <p className="text-gray-600 text-sm md:text-base mb-4 leading-relaxed">
+                      Our system searches through verified legal databases including the Constitution of India, 
+                      Indian Penal Code (IPC), Code of Criminal Procedure (CrPC), and landmark Supreme Court judgments.
+                    </p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="bg-white rounded-lg p-3 border border-line-gray text-center">
+                        <div className="text-2xl font-bold text-medium-blue">560+</div>
+                        <div className="text-xs text-gray-600">IPC Sections</div>
+                      </div>
+                      <div className="bg-white rounded-lg p-3 border border-line-gray text-center">
+                        <div className="text-2xl font-bold text-medium-blue">470+</div>
+                        <div className="text-xs text-gray-600">Articles</div>
+                      </div>
+                      <div className="bg-white rounded-lg p-3 border border-line-gray text-center">
+                        <div className="text-2xl font-bold text-medium-blue">1000+</div>
+                        <div className="text-xs text-gray-600">SC Judgments</div>
+                      </div>
+                      <div className="bg-white rounded-lg p-3 border border-line-gray text-center">
+                        <div className="text-2xl font-bold text-medium-blue">100%</div>
+                        <div className="text-xs text-gray-600">Verified</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <img 
+                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&auto=format&fit=crop"
+                  alt="Legal database search"
+                  className="w-full h-48 md:h-64 object-cover rounded-xl shadow-lg"
+                />
+              </div>
+            ),
+          },
+          {
+            title: "Step 3",
+            content: (
+              <div className="space-y-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-medium-blue/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <FileCheck className="w-6 h-6 text-medium-blue" />
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold text-deep-blue mb-3">Answer Generation</h4>
+                    <p className="text-gray-600 text-sm md:text-base mb-4 leading-relaxed">
+                      Using only verified sources, our AI generates comprehensive answers with proper citations. 
+                      Every claim is backed by specific sections, articles, or case law references.
+                    </p>
+                    <div className="bg-gradient-to-br from-medium-blue/5 to-accent-blue/5 rounded-lg p-4 border border-medium-blue/20">
+                      <p className="text-sm text-gray-700 italic mb-2">
+                        "Article 19 of the Constitution guarantees six freedoms including freedom of speech and expression, 
+                        subject to reasonable restrictions under Article 19(2)."
+                      </p>
+                      <div className="flex items-center gap-2 text-xs text-medium-blue">
+                        <span className="font-medium">Source:</span>
+                        <span>Constitution of India, Article 19</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <img 
+                  src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&auto=format&fit=crop"
+                  alt="AI answer generation"
+                  className="w-full h-48 md:h-64 object-cover rounded-xl shadow-lg"
+                />
+              </div>
+            ),
+          },
+          {
+            title: "Step 4",
+            content: (
+              <div className="space-y-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-medium-blue/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="w-6 h-6 text-medium-blue" />
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold text-deep-blue mb-3">Answer Validation</h4>
+                    <p className="text-gray-600 text-sm md:text-base mb-4 leading-relaxed">
+                      Before delivery, every answer undergoes validation to verify citations exist, 
+                      detect potential hallucinations, and ensure confidence scores meet our strict threshold.
+                    </p>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between bg-white rounded-lg p-3 border border-line-gray">
+                        <span className="text-sm font-medium text-gray-700">Citation Verification</span>
+                        <span className="text-xs font-bold text-green-600">✓ PASSED</span>
+                      </div>
+                      <div className="flex items-center justify-between bg-white rounded-lg p-3 border border-line-gray">
+                        <span className="text-sm font-medium text-gray-700">Hallucination Detection</span>
+                        <span className="text-xs font-bold text-green-600">✓ PASSED</span>
+                      </div>
+                      <div className="flex items-center justify-between bg-white rounded-lg p-3 border border-line-gray">
+                        <span className="text-sm font-medium text-gray-700">Confidence Threshold</span>
+                        <span className="text-xs font-bold text-green-600">95%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <img 
+                  src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&auto=format&fit=crop"
+                  alt="Validation process"
+                  className="w-full h-48 md:h-64 object-cover rounded-xl shadow-lg"
+                />
+              </div>
+            ),
+          },
+          {
+            title: "Step 5",
+            content: (
+              <div className="space-y-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-medium-blue/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Shield className="w-6 h-6 text-medium-blue" />
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold text-deep-blue mb-3">Safety Check</h4>
+                    <p className="text-gray-600 text-sm md:text-base mb-4 leading-relaxed">
+                      Final safety verification ensures the answer doesn't inadvertently provide harmful advice, 
+                      maintains educational context, and includes appropriate disclaimers where necessary.
+                    </p>
+                    <div className="bg-green-50 border-l-4 border-green-600 p-4 rounded-lg">
+                      <div className="flex items-start gap-3">
+                        <Shield className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-sm font-semibold text-green-900 mb-1">Safety Verified</p>
+                          <p className="text-xs text-green-700">
+                            This answer has passed all safety checks and is ready for educational use. 
+                            Always consult a qualified lawyer for specific legal advice.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <img 
+                  src="https://images.unsplash.com/photo-1505664194779-8beaceb93744?w=800&auto=format&fit=crop"
+                  alt="Safety verification"
+                  className="w-full h-48 md:h-64 object-cover rounded-xl shadow-lg"
+                />
+              </div>
+            ),
+          },
+        ]} />
       </section>
 
       {/* Footer */}
