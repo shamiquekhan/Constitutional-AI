@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useToast } from '../hooks/useToast';
 import LoadingSpinner, { SkeletonLoader } from '../components/LoadingSpinner';
+import { GlowingEffect } from '../components/ui/glowing-effect';
+import { Scale, GraduationCap, Users } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -383,17 +385,85 @@ export default function Dashboard() {
             </div>
             <h3 className="text-center text-3xl font-bold text-deep-blue mb-12">Who is at risk?</h3>
             <div className="grid md:grid-cols-3 gap-8">
-              <div className="bg-bg-gray p-8 rounded-xl border border-line-gray text-center hover:border-medium-blue hover:shadow-lg transition">
-                <h4 className="text-lg font-bold text-deep-blue mb-3">Lawyers</h4>
-                <p className="text-sm text-gray-600 leading-relaxed">Risk filing incorrect citations in court</p>
+              {/* Lawyers Card */}
+              <div className="relative min-h-[14rem]">
+                <div className="relative h-full rounded-xl border-[0.75px] border-line-gray p-2">
+                  <GlowingEffect
+                    spread={40}
+                    glow={true}
+                    disabled={false}
+                    proximity={64}
+                    inactiveZone={0.01}
+                    borderWidth={2}
+                  />
+                  <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-lg border-[0.75px] bg-bg-gray p-8 shadow-sm hover:shadow-lg transition-shadow">
+                    <div className="relative flex flex-1 flex-col justify-between gap-4">
+                      <div className="w-fit rounded-lg border border-line-gray bg-white p-3 shadow-sm">
+                        <Scale className="h-5 w-5 text-medium-blue" />
+                      </div>
+                      <div className="space-y-3">
+                        <h4 className="text-lg font-bold text-deep-blue">Lawyers</h4>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          Risk filing incorrect citations in court, potentially damaging cases and professional reputation
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="bg-bg-gray p-8 rounded-xl border border-line-gray text-center hover:border-medium-blue hover:shadow-lg transition">
-                <h4 className="text-lg font-bold text-deep-blue mb-3">Law Students</h4>
-                <p className="text-sm text-gray-600 leading-relaxed">Learning from fabricated legal precedents</p>
+
+              {/* Law Students Card */}
+              <div className="relative min-h-[14rem]">
+                <div className="relative h-full rounded-xl border-[0.75px] border-line-gray p-2">
+                  <GlowingEffect
+                    spread={40}
+                    glow={true}
+                    disabled={false}
+                    proximity={64}
+                    inactiveZone={0.01}
+                    borderWidth={2}
+                  />
+                  <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-lg border-[0.75px] bg-bg-gray p-8 shadow-sm hover:shadow-lg transition-shadow">
+                    <div className="relative flex flex-1 flex-col justify-between gap-4">
+                      <div className="w-fit rounded-lg border border-line-gray bg-white p-3 shadow-sm">
+                        <GraduationCap className="h-5 w-5 text-medium-blue" />
+                      </div>
+                      <div className="space-y-3">
+                        <h4 className="text-lg font-bold text-deep-blue">Law Students</h4>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          Learning from fabricated legal precedents, undermining their legal education foundation
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="bg-bg-gray p-8 rounded-xl border border-line-gray text-center hover:border-medium-blue hover:shadow-lg transition">
-                <h4 className="text-lg font-bold text-deep-blue mb-3">Citizens</h4>
-                <p className="text-sm text-gray-600 leading-relaxed">Receiving wrong legal advice</p>
+
+              {/* Citizens Card */}
+              <div className="relative min-h-[14rem]">
+                <div className="relative h-full rounded-xl border-[0.75px] border-line-gray p-2">
+                  <GlowingEffect
+                    spread={40}
+                    glow={true}
+                    disabled={false}
+                    proximity={64}
+                    inactiveZone={0.01}
+                    borderWidth={2}
+                  />
+                  <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-lg border-[0.75px] bg-bg-gray p-8 shadow-sm hover:shadow-lg transition-shadow">
+                    <div className="relative flex flex-1 flex-col justify-between gap-4">
+                      <div className="w-fit rounded-lg border border-line-gray bg-white p-3 shadow-sm">
+                        <Users className="h-5 w-5 text-medium-blue" />
+                      </div>
+                      <div className="space-y-3">
+                        <h4 className="text-lg font-bold text-deep-blue">Citizens</h4>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          Receiving wrong legal advice that could lead to serious legal consequences
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
