@@ -10,8 +10,9 @@ export const useLegalQuery = () => {
     setError(null);
 
     try {
+      const API_URL = process.env.REACT_APP_API_URL || '';
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/v1/query/legal`,
+        `${API_URL}/api/v1/query/legal`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
